@@ -1,5 +1,5 @@
 import asyncio
-from telethon import TelegramClient
+from telethon import TelegramClient, helpers
 import datetime
 import pytz
 
@@ -25,6 +25,6 @@ class PrinterService(TelegramClient):
         asyncio.ensure_future(self.__print_dialogs__())
 
     async def __print_dialogs__(self):
-        dialogs = await self.client.get_dialogs()
+        dialogs = helpers.TotalList(await self.client.get_dialogs())
         for dialog in dialogs:
-            print(dialog.name, ':', dialog.message.to_id)
+            print(dialog)

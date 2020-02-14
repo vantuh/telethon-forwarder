@@ -1,5 +1,6 @@
 .idea
 env
 venv
-*.session
 __pycache__
+*.session
+*.session-journal
