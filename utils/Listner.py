@@ -18,6 +18,7 @@ class Listner:
         @self.client.on(events.NewMessage(chats=self.option.channels_list))
         async def normal_handler(event: events.NewMessage.Event):
             message = event.message
+            print('[MSG]', message.id, 'logged...')
             await self.client.forward_messages(self.option.forward_channel, message)
 
     def __ids_listener__(self):
@@ -28,4 +29,5 @@ class Listner:
             message = event.message
             for channel in self.option.channels_list:
                 if message.to_id.channel_id == channel:
+                    print('[MSG]', message.id, 'logged...')
                     await client.forward_messages(self.option.forward_channel, message)
