@@ -10,9 +10,9 @@ class Forwarder:
             for (dirpath, dirnames, filenames) in os.walk(os.environ['CHANNELS_DIR']):
                 for filename in filenames:
                     with FileWorker("%s/%s" % (dirpath, filename)) as file_worker:
-                        id_str = os.path.splitext(filename)[0]
-                        to_channel = Channel(id_str, id_str, 1)
-                        ChannelListner(client, ForwardOption(file_worker.channels, to_channel))
+                        if len(file_worker.channels) > 1:
+                            to_channel = Channel(file_worker.channels[0].identifier, file_worker.channels[0].name, 1)
+                            ChannelListner(client, ForwardOption(file_worker.channels, to_channel))
 
             client.run_until_disconnected()
 
