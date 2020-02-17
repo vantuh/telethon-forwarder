@@ -1,8 +1,7 @@
-from classes.Channel import Channel
+from .Channel import Channel
 
 
 class ForwardOption:
-    def __init__(self, name: str, channels: list, forward_channel: Channel):
-        self.name = name
-        self.channels_list = channels
-        self.forward_channel = forward_channel
+    def __init__(self, from_channel: Channel, to_channel: Channel):
+        self.from_channel = from_channel
+        self.to_channel = to_channel

@@ -1,26 +1,20 @@
 from telethon import TelegramClient
-import utils
-from classes import ForwardOption
-from utils import Listner
+import os
+from classes import ForwardOption, Channel
+from utils import ChannelListner, FileWorker
+from services import PrinterService
 
 
-class Forwarder(list):
-    def __init__(self, options):
-        self.client = TelegramClient(utils.VARIABLES.SESSION['NAME'],
-                                     utils.VARIABLES.SESSION['API_ID'],
-                                     utils.VARIABLES.SESSION['API_HASH'])
-        for option in options:
-            Listner(self.client, option)
-        self.client.start()
-        self.client.run_until_disconnected()
+class Forwarder:
+    def __init__(self):
+        with TelegramClient(os.environ['SESSION_NAME'], os.environ['API_ID'], os.environ['API_HASH']) as client:
+            for (dirpath, dirnames, filenames) in os.walk(os.environ['CHANNELS_DIR']):
+                for filename in filenames:
+                    with FileWorker("%s/%s" % (dirpath, filename)) as file_worker:
+                        for channel in file_worker.channels:
+                            ChannelListner(client, ForwardOption(channel, Channel('%s' % (os.path.splitext(filename)[0]), '', 1)))
+
+            client.run_until_disconnected()
 
 
-forward_options = []
-forward_options.append(ForwardOption('MemeList',
-                                     utils.VARIABLES.CHANNELS['MEME_CHANNELS'],
-                                     utils.VARIABLES.CHANNELS['HOST_CHANNEL']))
-# forward_options.append(ForwardOption('ClosedList',
-#                                      utils.VARIABLES.CHANNELS['CLOSED_CHANNELS'],
-#                                      utils.VARIABLES.CHANNELS['HOST_CHANNEL']))
-
-forwarder = Forwarder(forward_options)
+forwarder = Forwarder()
