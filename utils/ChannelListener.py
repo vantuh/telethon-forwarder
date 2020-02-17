@@ -7,33 +7,30 @@ class ChannelListner:
         self.client = client
         self.option = option
 
-        if option.from_channel.identifier.isdigit():
-            self.__ids_listener__()
-        else:
-            self.__chats_listener__()
+        self.numeric_channels_identifiers = []
+        self.test_channels_identifiers = []
+        for channel in option.from_channels:
+            if channel.identifier.isdigit():
+                self.numeric_channels_identifiers.append(channel.identifier)
+            else:
+                self.test_channels_identifiers.append(channel.identifier)
+
+        self.__chats_listener__()
+        self.__ids_listener__()
 
     def __chats_listener__(self):
-        print('%s : %s '% (self.option.to_channel.identifier, self.option.from_channel.identifier))
-        @self.client.on(events.NewMessage(chats=self.option.from_channel.identifier))
-        async def normal_handler(event: events.NewMessage.Event):
-            id = int(self.option.to_channel.identifier)\
-                if self.option.to_channel.identifier.isdigit()\
-                else self.option.to_channel.identifier
-            await self.client.forward_messages(id, event.message)
+        if len(self.test_channels_identifiers) > 0:
+            @self.client.on(events.NewMessage(chats=self.test_channels_identifiers))
+            async def normal_handler(event: events.NewMessage.Event):
+                await self.client.forward_messages(self.option.to_channel.identifier, event.message)
 
     def __ids_listener__(self):
-        @self.client.on(events.NewMessage)
-        async def normal_handler(event: events.NewMessage.Event):
-            if message.to_id.channel_id == self.option.from_channel.identifier:
-                id = int(self.option.to_channel.identifier)\
-                    if self.option.to_channel.identifier.isdigit()\
-                    else self.option.to_channel.identifier
-                await self.client.forward_messages(id, event.message)
-
-    def __log__listener__(self):
-        print('[Listener] for [%s] started...' % self.option.from_channel.name)
+        if len(self.numeric_channels_identifiers) > 0:
+            @self.client.on(events.NewMessage)
+            async def normal_handler(event: events.NewMessage.Event):
+                for channel in self.numeric_channels_identifiers:
+                    if event.message.to_id.channel_id == channel:
+                        await self.client.forward_messages(self.option.to_channel.identifier, event.message)
 
     def __log_message__(self, message):
-        print('[MSG] %s from [%s] reposted to [%s]...' % (message.id,
-                                                          self.option.from_channel.name,
-                                                          self.option.to_channel.identifier))
+        print('[MSG] %s reposted to [%s]...' % (message.id, self.option.to_channel.identifier))
