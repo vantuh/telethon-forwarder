@@ -9,9 +9,11 @@ class ChannelListner:
 
         self.numeric_channels_identifiers = []
         self.test_channels_identifiers = []
+        print('--- [%s] ---' % (option.to_channel.name))
         for channel in option.from_channels:
+            print('[%s] mapped...' % (channel.name))
             if channel.identifier.isdigit():
-                self.numeric_channels_identifiers.append(channel.identifier)
+                self.numeric_channels_identifiers.append(int(channel.identifier))
             else:
                 self.test_channels_identifiers.append(channel.identifier)
 
