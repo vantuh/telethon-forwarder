@@ -13,7 +13,8 @@ class ChannelListner:
         for channel in option.from_channels[1:]:
             print('[%s] mapped...' % (channel.name))
             if channel.identifier.isdigit():
-                self.numeric_channels_identifiers.append(int(channel.identifier))
+                self.numeric_channels_identifiers.append(
+                    int(channel.identifier))
             else:
                 self.text_channels_identifiers.append(channel.identifier)
 
@@ -35,4 +36,5 @@ class ChannelListner:
                         await self.client.forward_messages(self.option.to_channel.identifier, event.message)
 
     def __log_message__(self, message):
-        print('[MSG] %s reposted to [%s]...' % (message.id, self.option.to_channel.identifier))
+        print('[MSG] %s reposted to [%s]...' %
+              (message.id, self.option.to_channel.identifier))

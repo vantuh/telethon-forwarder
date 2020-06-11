@@ -14,7 +14,8 @@ class FileWorker:
         reader = csv.DictReader(self.file, delimiter=',')
         self.channels = []
         for line in reader:
-            self.channels.append(Channel(line["identifier"], line["name"], datetime.datetime.today()))
+            self.channels.append(
+                Channel(line["identifier"], line["name"], datetime.datetime.today()))
 
     def __enter__(self):
         return self
