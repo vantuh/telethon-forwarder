@@ -22,7 +22,14 @@ class PrinterService(TelegramClient):
                 print(message.id)
 
     def print_dialogs(self):
-        asyncio.ensure_future(self.__print_dialogs__())
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(self.__print_dialogs__())
+        except asyncio.CancelledError as expression:
+            print('Dialogs can\'t be printed.\n%s', expression)
+        finally:
+            loop.close()
+            asyncio.set_event_loop(asyncio.new_event_loop())
 
     async def __print_dialogs__(self):
         dialogs = helpers.TotalList(await self.client.get_dialogs())
