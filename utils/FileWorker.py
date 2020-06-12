@@ -1,4 +1,4 @@
-import csv
+import pandas as pd
 import datetime
 from classes import Channel
 
@@ -6,15 +6,19 @@ from classes import Channel
 class FileWorker:
     def __init__(self, filename: str):
         self.filename = filename
-        self.__fetch_channels__()
+        self.dataframe = pd.read_csv(self.filename, delimiter=',')
 
-    def __fetch_channels__(self):
-        self.channels = []
-        file = open(self.filename, mode='r')
-        reader = csv.DictReader(file, delimiter=',')
-        for line in reader:
-            self.channels.append(
-                Channel(line["identifier"], line["name"], datetime.datetime.today()))
+    def fetch_channels(self) -> [Channel]:
+        channels = []
+        for row in self.dataframe.itertuples():
+            channels.append(
+                Channel(row.identifier, row.name, row.date))
+        return channels
+
+    def append_date(self, identifier, date):
+        self.dataframe.loc[self.dataframe.identifier ==
+                           str(identifier), 'date'] = date
+        self.dataframe.to_csv(self.filename)
 
     def __enter__(self):
         return self

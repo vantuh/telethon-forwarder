@@ -8,5 +8,6 @@ class Channel:
         self.last_message_date = last_message_date
 
     def __str__(self):
-        template = '%s : %s' % (self.name, self.identifier)
+        template = '%s : %s : %s' % (
+            self.name, self.identifier, self.last_message_date)
         return template
