@@ -1,8 +1,7 @@
 from telethon import TelegramClient
 import os
 
-from utils import FileWorker, ChannelListner
-from classes import Channel, ForwardOption
+from utils import ChannelListner
 
 
 class Forwarder:
@@ -13,7 +12,7 @@ class Forwarder:
                     if filename.endswith(".csv"):
                         ChannelListner(client, "%s/%s" % (dirpath, filename))
 
-        client.run_until_disconnected()
+            client.run_until_disconnected()
 
 
 forwarder = Forwarder()

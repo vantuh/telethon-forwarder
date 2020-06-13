@@ -1,6 +1,7 @@
 from telethon import TelegramClient, events
 from classes import ForwardOption, Channel
 from .FileWorker import FileWorker
+from services import Logger
 
 
 class ChannelListner:
@@ -12,9 +13,8 @@ class ChannelListner:
         self.numeric_channels_identifiers = []
         self.text_channels_identifiers = []
 
-        print('--- [%s] ---' % (self.option.to_channel.name))
         for channel in self.option.from_channels[1:]:
-            print('[%s] mapped...' % (channel.name))
+            Logger.log_channel(channel)
             if channel.identifier.isdigit():
                 self.numeric_channels_identifiers.append(
                     int(channel.identifier))
@@ -31,18 +31,30 @@ class ChannelListner:
 
     def __chats_listener__(self):
         if len(self.text_channels_identifiers) > 0:
+            @self.client.on(events.Album(chats=self.text_channels_identifiers))
+            async def normal_handler(event: events.Album.Event):
+                Logger.log_event(event)
+                await event.forward_to(self.option.to_channel.identifier)
+
             @self.client.on(events.NewMessage(chats=self.text_channels_identifiers))
-            async def normal_handler(event):
-                # TODO: Unwrap event message object ot channel_id and modify date in .csv
-                await self.client.forward_messages(self.option.to_channel.identifier, event.message)
+            async def normal_handler(event: events.NewMessage.Event):
+                if event.message.grouped_id is None:
+                    Logger.log_event(event)
+                    await self.client.forward_messages(
+                        self.option.to_channel.identifier, event.message)
 
     def __ids_listener__(self):
         if len(self.numeric_channels_identifiers) > 0:
+            @self.client.on(events.Album)
+            async def normal_handler(event: events.Album.Event):
+                for channel in self.numeric_channels_identifiers:
+                    if event.message.to_id.channel_id == channel:
+                        Logger.log_event(event)
+                        await event.forward_to(self.option.to_channel.identifier)
+
             @self.client.on(events.NewMessage)
             async def normal_handler(event):
                 for channel in self.numeric_channels_identifiers:
                     if event.message.to_id.channel_id == channel:
-                        # TODO: Unwrap event message object ot channel_id and modify date in .csv
+                        Logger.log_event(event)
                         await self.client.forward_messages(self.option.to_channel.identifier, event.message)
-
-    # TODO: Logger service
